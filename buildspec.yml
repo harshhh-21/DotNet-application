@@ -28,7 +28,7 @@ phases:
 
       - cd dotnet-gitops-manifests
 
-      - sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml
+      - 'sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml'
 
       - git config --global user.email "codebuild@example.com"
 
