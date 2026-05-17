@@ -3,14 +3,16 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo Logging into Amazon ECR...
+      - echo "Logging into Amazon ECR..."
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 000418617326.dkr.ecr.us-east-1.amazonaws.com
 
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
+      - echo "Image tag is $IMAGE_TAG"
+
   build:
     commands:
-      - echo Build started on `date`
+      - echo "Build started on $(date)"
 
       - docker build -t dotnet_repo:$IMAGE_TAG .
 
@@ -18,29 +20,35 @@ phases:
 
   post_build:
     commands:
-      - echo Pushing Docker image...
+      - echo "Pushing Docker image..."
 
       - docker push 000418617326.dkr.ecr.us-east-1.amazonaws.com/dotnet_repo:$IMAGE_TAG
 
-      - echo Updating GitOps repo...
+      - echo "Updating GitOps repository..."
 
-      - git clone https://$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
+      - git clone https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
 
       - cd dotnet-gitops-manifests
-      
-      - git remote set-url origin https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
-
-      - 'sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml'
 
       - git config --global user.email "codebuild@example.com"
 
       - git config --global user.name "harshhh-21"
 
+      - git remote set-url origin https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
+
+      - echo "Current values.yaml:"
+      - cat values.yaml
+
+      - 'sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml'
+
+      - echo "Updated values.yaml:"
+      - cat values.yaml
+
       - git add values.yaml
 
-      - git commit -m "Updated image tag to $IMAGE_TAG"
+      - git diff --cached --quiet || git commit -m "Updated image tag to $IMAGE_TAG"
 
-      - git push
+      - git push origin main
 
 artifacts:
   files:
