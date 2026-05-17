@@ -24,7 +24,7 @@ phases:
 
       - echo Updating GitOps repo...
 
-      - git clone https://$GITHUB_TOKEN@github.com/YOUR_GITHUB_USERNAME/dotnet-gitops-manifests.git
+      - git clone https://$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
 
       - cd dotnet-gitops-manifests
 
