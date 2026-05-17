@@ -11,13 +11,34 @@ phases:
   build:
     commands:
       - echo Build started on `date`
+
       - docker build -t dotnet_repo:$IMAGE_TAG .
+
       - docker tag dotnet_repo:$IMAGE_TAG 000418617326.dkr.ecr.us-east-1.amazonaws.com/dotnet_repo:$IMAGE_TAG
 
   post_build:
     commands:
       - echo Pushing Docker image...
+
       - docker push 000418617326.dkr.ecr.us-east-1.amazonaws.com/dotnet_repo:$IMAGE_TAG
+
+      - echo Updating GitOps repo...
+
+      - git clone https://$GITHUB_TOKEN@github.com/YOUR_GITHUB_USERNAME/dotnet-gitops-manifests.git
+
+      - cd dotnet-gitops-manifests
+
+      - sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml
+
+      - git config --global user.email "codebuild@example.com"
+
+      - git config --global user.name "harshhh-21"
+
+      - git add values.yaml
+
+      - git commit -m "Updated image tag to $IMAGE_TAG"
+
+      - git push
 
 artifacts:
   files:
