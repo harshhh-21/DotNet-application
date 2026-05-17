@@ -27,6 +27,8 @@ phases:
       - git clone https://$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
 
       - cd dotnet-gitops-manifests
+      
+      - git remote set-url origin https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
 
       - 'sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml'
 
