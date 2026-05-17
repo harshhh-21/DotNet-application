@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+    name: dotnet-app-service
+    namespace: dotnet-app
+spec:
+    type: LoadBalancer
+
+    selector:
+    #this will link to the deployment
+        app: dotnet-app
+    ports:
+        - port: 80
+          targetPort: 8080

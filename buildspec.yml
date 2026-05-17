@@ -1,12 +1,24 @@
 version: 0.2
 
 phases:
-  install:
+  pre_build:
     commands:
-      - powershell -NoProfile -ExecutionPolicy Bypass -File build\publish.ps1
+      - echo Logging into Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 000418617326.dkr.ecr.us-east-1.amazonaws.com
+
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - docker build -t dotnet_repo:$IMAGE_TAG .
+      - docker tag dotnet_repo:$IMAGE_TAG 000418617326.dkr.ecr.us-east-1.amazonaws.com/dotnet_repo:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Pushing Docker image...
+      - docker push 000418617326.dkr.ecr.us-east-1.amazonaws.com/dotnet_repo:$IMAGE_TAG
 
 artifacts:
   files:
     - '**/*'
-  base-directory: dist
-  discard-paths: no
