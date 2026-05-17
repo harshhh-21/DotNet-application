@@ -34,21 +34,19 @@ phases:
 
       - git config --global user.name "harshhh-21"
 
-      - git remote set-url origin https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git
-
-      - echo "Current values.yaml:"
+      - echo "Before update:"
       - cat values.yaml
 
       - 'sed -i "s|tag:.*|tag: $IMAGE_TAG|g" values.yaml'
 
-      - echo "Updated values.yaml:"
+      - echo "After update:"
       - cat values.yaml
 
       - git add values.yaml
 
       - git diff --cached --quiet || git commit -m "Updated image tag to $IMAGE_TAG"
 
-      - git push origin main
+      - git push https://oauth2:$GITHUB_TOKEN@github.com/harshhh-21/dotnet-gitops-manifests.git HEAD:main
 
 artifacts:
   files:
